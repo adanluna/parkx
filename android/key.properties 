@@ -1,0 +1,4 @@
+storePassword=claudia01
+keyPassword=claudia01
+keyAlias=upload
+storeFile=/Users/adanluna/upload-keystore.jks
