@@ -57,8 +57,6 @@ class UserRepository {
       'ciudad_id': ciudadId,
       'genero_id': generoId,*/
     });
-    //var user = User.fromJSON(data);
-    //AccountManager.instance.user = user;
     return true;
   }
 

@@ -13,7 +13,6 @@ class WalletRepository {
   Future<Wallet?> wallet() async {
     try {
       final response = await _helper.get(path: '/mobile/wallet');
-      print(response);
       return Wallet.fromJSON(response);
     } on UnauthorizedException catch (_) {
       return null;
@@ -27,6 +26,17 @@ class WalletRepository {
     } on UnauthorizedException catch (_) {
       return null;
     }
+  }
+
+  Future<bool> initOxxoPayment() async {
+    try {
+      final response = await _helper.get(path: '/mobile/wallet/payment/oxxo');
+      final clientSecret = response['clientSecret'];
+      final customerSessionClientSecret =  response['customerSessionClientSecret'];
+    } on UnauthorizedException catch (_) {
+      return false;
+    }
+    return true;
   }
 
   Future<bool> saveCreditCard() async {

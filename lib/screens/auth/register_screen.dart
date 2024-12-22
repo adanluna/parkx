@@ -81,7 +81,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             controller: nombreController,
                                             style: AppTheme.theme.textTheme.bodyMedium,
                                             decoration: const InputDecoration(labelText: "Nombre(s)"),
-                                            keyboardType: TextInputType.name,
+                                            keyboardType: TextInputType.text,
+                                            textCapitalization: TextCapitalization.words,
                                             validator: (value) {
                                               if (value == null || value.isEmpty) {
                                                 return 'Proporciona tu nombre(s)';
@@ -96,7 +97,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             controller: apellidoController,
                                             style: AppTheme.theme.textTheme.bodyMedium,
                                             decoration: const InputDecoration(labelText: "Apellidos"),
-                                            keyboardType: TextInputType.name,
+                                            keyboardType: TextInputType.text,
+                                            textCapitalization: TextCapitalization.words,
                                             validator: (value) {
                                               if (value == null || value.isEmpty) {
                                                 return 'Proporciona tus apellidos';

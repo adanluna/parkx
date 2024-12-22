@@ -179,7 +179,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '${card.brand.toUpperCase()} **** ${card.last4}',
+                                        '${card.brand.toUpperCase()}/****${card.last4}',
                                         style: const TextStyle(
                                             color: AppTheme.primaryColor, fontFamily: 'Roboto', fontSize: 13, fontWeight: FontWeight.bold),
                                       ),

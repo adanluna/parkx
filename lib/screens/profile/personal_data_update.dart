@@ -32,6 +32,13 @@ class _PersonalDataUpdateScreenState extends State<PersonalDataUpdateScreen> {
   }
 
   @override
+  void dispose() {
+    nombreController.dispose();
+    apellidosController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBarWidget(
@@ -64,6 +71,8 @@ class _PersonalDataUpdateScreenState extends State<PersonalDataUpdateScreen> {
                                 autofocus: true,
                                 controller: nombreController,
                                 style: AppTheme.theme.textTheme.bodyMedium,
+                                keyboardType: TextInputType.text,
+                                textCapitalization: TextCapitalization.words,
                                 decoration: const InputDecoration(labelText: "Nombre"),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -79,7 +88,8 @@ class _PersonalDataUpdateScreenState extends State<PersonalDataUpdateScreen> {
                                 controller: apellidosController,
                                 style: AppTheme.theme.textTheme.bodyMedium,
                                 decoration: const InputDecoration(labelText: "Apellidos"),
-                                keyboardType: TextInputType.name,
+                                keyboardType: TextInputType.text,
+                                textCapitalization: TextCapitalization.words,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Proporciona tus apellidos';
