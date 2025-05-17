@@ -5,10 +5,13 @@ import 'package:parkx/env.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   Stripe.publishableKey = stripePublishableKey;
   Stripe.merchantIdentifier = merchantIdApplePay;
-  WidgetsFlutterBinding.ensureInitialized();
+  Stripe.urlScheme = 'flutterstripe';
+  await Stripe.instance.applySettings();
+
   AccountManager.instance.configure().then((_) {
     FlavorConfig(
       flavor: Flavor.staging,

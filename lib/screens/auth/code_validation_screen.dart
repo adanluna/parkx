@@ -135,7 +135,7 @@ class _CodeValidationScreenState extends State<CodeValidationScreen> {
 
   void _validate(BuildContext context, verificationCode) {
     context.loaderOverlay.show();
-    UserRepository().activate(code: verificationCode).then((value) async {
+    UserRepository().confirmCode(email: email, code: verificationCode).then((value) async {
       context.loaderOverlay.hide();
       showSuccessDialog(context, message: 'Cuenta validadada, usa tu correo y contraseña para entrar');
       _goLogin();

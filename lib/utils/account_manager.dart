@@ -1,14 +1,13 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:parkx/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:parkx/models/user.dart';
 
 class AccountManager {
   static final AccountManager instance = AccountManager._privateConstructor();
 
   final _secureStorage = const FlutterSecureStorage(
-      aOptions: AndroidOptions(
-    encryptedSharedPreferences: true,
-  ));
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
   late SharedPreferences _sharedPreferences;
 
   User? _user;
@@ -17,41 +16,56 @@ class AccountManager {
 
   AccountManager._privateConstructor();
 
-  Future<String?> get authToken async {
-    if (_authToken != null) return Future.value(_authToken);
-    try {
-      _authToken = await _secureStorage.read(key: 'authToken');
-    } catch (e) {
-      print(e);
-      _authToken = null;
-    }
-    return _authToken;
-  }
-
-  set authToken(value) => _secureStorage.write(key: 'authToken', value: value);
-
-  User get user => _user!;
-  set user(value) => _user = value;
-
-  String? get email {
-    if (_email != null) {
-      _email = _sharedPreferences.getString('email');
-    }
-    return _email;
-  }
-
   Future configure() async {
     _sharedPreferences = await SharedPreferences.getInstance();
   }
 
-  Future setAuth({required User user, required String token}) {
-    _user = user;
-    return Future.wait([_sharedPreferences.setString('email', user.email), _secureStorage.write(key: 'authToken', value: token)]);
+  // Get token (use this in ApiBaseHelper)
+  Future<String?> getToken() async {
+    if (_authToken != null) return _authToken;
+    try {
+      _authToken = await _secureStorage.read(key: 'authToken');
+    } catch (e) {
+      print("Token read error: $e");
+    }
+    return _authToken;
   }
 
+  // Set token
+  set authToken(String? value) {
+    _authToken = value;
+    if (value != null) {
+      _secureStorage.write(key: 'authToken', value: value);
+    } else {
+      _secureStorage.delete(key: 'authToken');
+    }
+  }
+
+  // Set auth (user + token)
+  Future setAuth({required User user, required String token}) async {
+    _user = user;
+    _email = user.email;
+    _authToken = token;
+    await Future.wait([
+      _sharedPreferences.setString('email', user.email),
+      _secureStorage.write(key: 'authToken', value: token),
+    ]);
+  }
+
+  // Clear all auth info
   Future clearAuth() async {
     _user = null;
+    _email = null;
     _authToken = null;
-    return await _secureStorage.delete(key: 'authToken');
+    await Future.wait([
+      _secureStorage.delete(key: 'authToken'),
+      _sharedPreferences.remove('email'),
+    ]);
   }
+
+  // Getters
+  User? get user => _user;
+  set user(User? value) => _user = value;
+
+  String? get email => _email ?? _sharedPreferences.getString('email');
 }

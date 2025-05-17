@@ -1,4 +1,4 @@
-//const stripePublishableKey = 'pk_test_51OaO5LDFtmWA3nAxRDcEQFiHi3B5I6jpb5MMMu9evTBDOHN9l9uw9Z4xZWJPb0Bcfnb24uNDxVPC34TdLKytHn9k00Pqi1RKrO';
-const stripePublishableKey = 'pk_live_51OaO5LDFtmWA3nAxb9hqGhS1ibpb2RPCiqhh0IsLDVTRfVzZAwhu3ZQZOZpFqjPh2sXmbYHt0rHYPBIT3ONYYaBB00hZLkgGQN';
+const stripePublishableKey = 'pk_test_51OaO5LDFtmWA3nAxRDcEQFiHi3B5I6jpb5MMMu9evTBDOHN9l9uw9Z4xZWJPb0Bcfnb24uNDxVPC34TdLKytHn9k00Pqi1RKrO';
+//const stripePublishableKey = 'pk_live_51OaO5LDFtmWA3nAxb9hqGhS1ibpb2RPCiqhh0IsLDVTRfVzZAwhu3ZQZOZpFqjPh2sXmbYHt0rHYPBIT3ONYYaBB00hZLkgGQN';
 const merchantIdApplePay = '';
 const parkxAppName = "ParkX";

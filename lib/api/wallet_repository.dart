@@ -8,7 +8,7 @@ import 'package:parkx/utils/account_manager.dart';
 
 class WalletRepository {
   final ApiBaseHelper _helper = ApiBaseHelper();
-  final User user = AccountManager.instance.user;
+  final User? user = AccountManager.instance.user;
 
   Future<Wallet?> wallet() async {
     try {
@@ -32,7 +32,7 @@ class WalletRepository {
     try {
       final response = await _helper.get(path: '/mobile/wallet/payment/oxxo');
       final clientSecret = response['clientSecret'];
-      final customerSessionClientSecret =  response['customerSessionClientSecret'];
+      final customerSessionClientSecret = response['customerSessionClientSecret'];
     } on UnauthorizedException catch (_) {
       return false;
     }
@@ -45,9 +45,11 @@ class WalletRepository {
     final clientSecret = response['clientSecret'];
 
     final billingDetails = BillingDetails(
-      email: user.email,
+      email: user?.email,
     );
-
+    if (user?.email == null) {
+      throw Exception('El usuario no tiene un correo electrónico registrado.');
+    }
     try {
       await Stripe.instance.createPaymentMethod(
         params: PaymentMethodParams.card(

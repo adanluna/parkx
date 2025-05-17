@@ -1,123 +1,147 @@
 import 'package:parkx/api/config/api_base_helper.dart';
-import 'package:parkx/api/config/api_exception.dart';
 import 'package:parkx/models/user.dart';
 import 'package:parkx/utils/account_manager.dart';
 
 class UserRepository {
   final ApiBaseHelper _helper = ApiBaseHelper();
 
-  Future<bool> login({
-    required String username,
-    required String password,
-    required bool remember,
-  }) async {
-    AccountManager.instance.clearAuth();
-    final response = await _helper.post(path: '/mobile/authenticate', body: {'username': username, 'password': password, 'rememberMe': remember});
-    String token = response['id_token'];
-    await AccountManager.instance.setAuth(user: User(), token: token);
-    return true;
-  }
-
-  Future<bool> create({
+  Future<bool> register({
+    required String name,
     required String email,
-    required String nombre,
-    required String apellidos,
     required String password,
+    required String verificationCode,
   }) async {
-    await _helper.post(path: '/mobile/register', body: {
+    await _helper.post(path: '/register', body: {
+      'name': name,
       'email': email,
-      'firstName': nombre,
-      'lastName': apellidos,
       'password': password,
-      'login': email,
+      'password_confirmation': password,
+      'code': verificationCode,
     });
     return true;
   }
 
-  Future<bool> activate({
+  Future<bool> sendVerificationCode({required String email}) async {
+    await _helper.post(path: '/send-code', body: {
+      'email': email,
+    });
+    return true;
+  }
+
+  Future<bool> confirmCode({
+    required String email,
     required String code,
   }) async {
-    await _helper.post(path: '/mobile/activate', body: {'key': code});
-    return true;
-  }
-
-  Future<bool> updatePersonalData({
-    required String nombre,
-    required String apellidos,
-    String? fechaNacimiento,
-    int? estadoId,
-    int? ciudadId,
-    int? generoId,
-  }) async {
-    await _helper.post(path: '/mobile/account', body: {
-      'firstName': nombre,
-      'lastName': apellidos,
-      /*'fecha_nacimiento': fechaNacimiento,
-      'estado_id': estadoId,
-      'ciudad_id': ciudadId,
-      'genero_id': generoId,*/
+    await _helper.post(path: '/verify-code', body: {
+      'email': email,
+      'code': code,
     });
     return true;
   }
 
-  Future<User> updatePassword({
+  Future<bool> login({
+    required String email,
     required String password,
   }) async {
-    final response = await _helper.post(path: '/user/update', body: {
-      'passord': password,
+    AccountManager.instance.clearAuth();
+    final response = await _helper.post(path: '/login', body: {
+      'email': email,
+      'password': password,
     });
-    var data = response['data'];
-    var user = User.fromJSON(data);
-    return user;
+
+    String token = response['token'];
+    var user = User.fromJSON(response['user']);
+    await AccountManager.instance.setAuth(user: user, token: token);
+    return true;
   }
 
-  Future<User> delete() async {
-    final response = await _helper.post(path: '/user/delete');
-    var data = response['data'];
-    var user = User.fromJSON(data);
-    return user;
+  Future<bool> logout() async {
+    try {
+      await _helper.post(path: '/logout');
+      await AccountManager.instance.clearAuth();
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<User?> getCurrentUser() async {
     try {
-      final response = await _helper.get(path: '/mobile/account');
+      final response = await _helper.get(path: '/user');
       final user = User.fromJSON(response);
       AccountManager.instance.user = user;
       return user;
-    } on UnauthorizedException catch (_) {
+    } catch (_) {
       return null;
     }
   }
 
-  Future logout() async {
-    try {
-      await _helper.get(path: '/user/logout');
-      return true;
-    } on UnauthorizedException catch (_) {
-      return null;
-    }
-  }
-
-  Future<User> setPushToken({required String token}) async {
-    final response = await _helper.post(path: '/user/fcm', body: {
-      'token': token,
-    });
-    return User.fromJSON(response['data']);
-  }
-
-  Future<bool> recoveryPasswordStep1({
-    required String email,
+  Future<bool> updatePersonalData({
+    required String name,
+    String? birthDate,
+    int? stateId,
+    int? cityId,
+    int? genderId,
   }) async {
-    AccountManager.instance.clearAuth();
-    await _helper.post(path: '/mobile/account/reset-password/init', body: {'email': email});
+    await _helper.post(path: '/user/update', body: {
+      'name': name,
+      if (birthDate != null) 'birth_date': birthDate,
+      if (stateId != null) 'state_id': stateId,
+      if (cityId != null) 'city_id': cityId,
+      if (genderId != null) 'gender_id': genderId,
+    });
+    return true;
+  }
+
+  Future<bool> updatePassword({
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    await _helper.post(path: '/user/password', body: {
+      'password': password,
+      'password_confirmation': passwordConfirmation,
+    });
+    return true;
+  }
+
+  Future<bool> deleteAccount() async {
+    await _helper.post(path: '/user/delete');
+    await AccountManager.instance.clearAuth();
+    return true;
+  }
+
+  Future<bool> savePushToken({required String fcmToken}) async {
+    await _helper.post(path: '/user/fcm', body: {
+      'token': fcmToken,
+    });
+    return true;
+  }
+
+  Future<bool> recoveryPasswordStep1({required String email}) async {
+    await _helper.post(path: '/forgot-password', body: {
+      'email': email,
+    });
     return true;
   }
 
   Future<bool> recoveryPasswordStep2({
-    required String key,
+    required String token,
+    required String email,
     required String password,
   }) async {
-    await _helper.post(path: '/mobile/account/reset-password/finish', body: {'key': key, 'newPassword': password});
+    await _helper.post(path: '/reset-password', body: {
+      'token': token,
+      'email': email,
+      'password': password,
+      'password_confirmation': password,
+    });
+    return true;
+  }
+
+  Future<bool> resendVerificationCode({required String email}) async {
+    await _helper.post(path: '/resend-code', body: {
+      'email': email,
+    });
     return true;
   }
 }

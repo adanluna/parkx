@@ -1,104 +1,74 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:parkx/api/config/api_exception.dart';
+import 'package:dio/dio.dart';
 import 'package:parkx/utils/account_manager.dart';
 import 'package:parkx/utils/flavor_config.dart';
+import 'api_exception.dart';
 
 class ApiBaseHelper {
-  final _client = http.Client();
-  final _accountManager = AccountManager.instance;
+  late Dio _dio;
 
-  Future<dynamic> get({required String path, Map<String, String>? params, Map<String, dynamic>? body}) =>
-      request(method: 'GET', path: path, params: params, body: body);
+  ApiBaseHelper() {
+    final flavor = FlavorConfig.instance.values;
 
-  Future<dynamic> patch({required String path, Map<String, dynamic>? body}) => request(method: 'PATCH', path: path, body: body);
+    BaseOptions options = BaseOptions(
+      baseUrl: "${flavor.scheme}://${flavor.hostName}:${flavor.port}/api",
+      connectTimeout: const Duration(seconds: 20),
+      receiveTimeout: const Duration(seconds: 20),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    );
 
-  Future<dynamic> post({required String path, Map<String, dynamic>? body}) => request(method: 'POST', path: path, body: body);
+    _dio = Dio(options);
+  }
 
-  Future<dynamic> request({
-    required String method,
-    required String path,
-    Map<String, String>? params,
-    Map<String, dynamic>? body,
+  Future<dynamic> get({required String path, Map<String, dynamic>? params}) => _request('GET', path, queryParameters: params);
+
+  Future<dynamic> post({required String path, Map<String, dynamic>? body}) => _request('POST', path, data: body);
+
+  Future<dynamic> patch({required String path, Map<String, dynamic>? body}) => _request('PATCH', path, data: body);
+
+  Future<dynamic> _request(
+    String method,
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? data,
   }) async {
-    final authToken = await _accountManager.authToken;
-    final uri = Uri(
-        scheme: FlavorConfig.instance.values.scheme,
-        host: FlavorConfig.instance.values.hostName,
-        port: FlavorConfig.instance.values.port,
-        path: "/api$path",
-        queryParameters: params);
-
-    var request = http.Request(method, uri);
-    request.headers['Content-Type'] = 'application/json';
-    request.headers['accept'] = 'application/json';
-    if (authToken != null) {
-      request.headers['Authorization'] = "Bearer $authToken";
-    }
-    if (body != null) {
-      request.body = jsonEncode(body);
-    }
-    Future<dynamic> responseJson;
     try {
-      final streamResponse = await _client.send(request).timeout(const Duration(seconds: 20));
-      responseJson = _returnResponse(streamResponse);
-      _updateAuthHeaders(streamResponse);
-    } catch (e) {
-      if (e is SocketException) {
-        //treat SocketException
-        print("Socket exception: ${e.toString()}");
-        throw FetchDataException();
-      } else if (e is TimeoutException) {
-        //treat TimeoutException
-        print("Timeout exception: ${e.toString()}");
-        throw FetchDataException();
-      } else {
-        print("Unhandled exception: ${e.toString()}");
+      final token = await AccountManager.instance.getToken();
+      if (token != null) {
+        _dio.options.headers['Authorization'] = 'Bearer $token';
       }
-      throw FetchDataException();
-    }
-    return responseJson;
-  }
 
-  dynamic _returnResponse(http.StreamedResponse response) async {
-    final responseString = await response.stream.bytesToString();
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      try {
-        return jsonDecode(responseString);
-      } on FormatException {
-        print('JSON FormatException');
-        return responseString;
-      }
-    } else {
-      switch (response.statusCode) {
-        case 302:
-          print("BadRequest [${response.statusCode}]: $responseString");
-          throw BadRequestException(responseJson: jsonDecode(responseString));
-        case 400:
-          print("BadRequest [${response.statusCode}]: $responseString");
-          throw BadRequestException(responseJson: jsonDecode(responseString));
-        case 401:
-        case 403:
-          print("Unauthorized [${response.statusCode}]: $responseString");
-          throw UnauthorizedException(responseJson: jsonDecode(responseString));
-        case 422:
-          print("FailValidation [${response.statusCode}]: $responseString");
-          throw FailValidationRequestException(responseJson: jsonDecode(responseString));
-        case 500:
-          print("FetchData [${response.statusCode}]: $responseString");
-          throw InternalErrorException(responseJson: jsonDecode(responseString));
-        default:
-          print("FetchData [${response.statusCode}]: $responseString");
-          throw FetchDataException();
-      }
+      final response = await _dio.request(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: Options(method: method),
+      );
+
+      return response.data;
+    } on DioException catch (e) {
+      return _handleError(e);
     }
   }
 
-  void _updateAuthHeaders(http.StreamedResponse response) {
-    if (response.headers.containsKey('Authorization')) {
-      AccountManager.instance.authToken = response.headers['Authorization'];
+  dynamic _handleError(DioException e) {
+    final statusCode = e.response?.statusCode;
+    final responseData = e.response?.data;
+
+    switch (statusCode) {
+      case 400:
+        throw BadRequestException(responseJson: responseData);
+      case 401:
+      case 403:
+        throw UnauthorizedException(responseJson: responseData);
+      case 422:
+        throw FailValidationRequestException(responseJson: responseData);
+      case 500:
+        throw InternalErrorException(responseJson: responseData);
+      default:
+        throw FetchDataException();
     }
   }
 }

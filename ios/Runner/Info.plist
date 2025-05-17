@@ -57,5 +57,12 @@
 		</array>
 		<key>io.flutter.embedded_views_preview</key>
 		<true />
+		<key>CFBundleAllowMixedLocalizations</key>
+		<string>true</string>
+		<key>CFBundleLocalizations</key>
+		<array>
+			<string>es</string>
+			<string>en</string>
+		</array>		
 	</dict>
 </plist>
