@@ -38,6 +38,8 @@ class ApiBaseHelper {
       final token = await AccountManager.instance.getToken();
       if (token != null) {
         _dio.options.headers['Authorization'] = 'Bearer $token';
+      } else {
+        _dio.options.headers.remove('Authorization');
       }
 
       final response = await _dio.request(

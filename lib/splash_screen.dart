@@ -67,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _goToOnboardingOrLogin() async {
     try {
-      final token = await AccountManager.instance.authToken;
+      final token = await AccountManager.instance.getToken();
       if (token != null) {
         UserRepository().getCurrentUser().then((user) async {
           if (user != null) {

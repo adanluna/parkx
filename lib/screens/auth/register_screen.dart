@@ -225,7 +225,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _create(BuildContext context) {
     context.loaderOverlay.show();
     UserRepository()
-        .create(email: emailController.text, nombre: nombreController.text, apellidos: apellidoController.text, password: passwordController.text)
+        .register(email: emailController.text, nombre: nombreController.text, apellidos: apellidoController.text, password: passwordController.text)
         .then((value) async {
       //analitycs.registerSignUp('Email');
       context.loaderOverlay.hide();
@@ -241,6 +241,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _goCodeValidation() {
-    Navigator.of(context).pushReplacementNamed('/code_validation');
+    Navigator.of(context).pushReplacementNamed('/code_validation', arguments: {
+      'email': emailController.text,
+    });
   }
 }

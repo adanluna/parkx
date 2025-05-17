@@ -5,18 +5,13 @@ import 'package:parkx/utils/account_manager.dart';
 class UserRepository {
   final ApiBaseHelper _helper = ApiBaseHelper();
 
-  Future<bool> register({
-    required String name,
-    required String email,
-    required String password,
-    required String verificationCode,
-  }) async {
+  Future<bool> register({required String nombre, required String email, required String apellidos, required String password}) async {
     await _helper.post(path: '/register', body: {
-      'name': name,
+      'name': nombre,
+      'apellidos': apellidos,
       'email': email,
       'password': password,
       'password_confirmation': password,
-      'code': verificationCode,
     });
     return true;
   }
@@ -78,6 +73,7 @@ class UserRepository {
 
   Future<bool> updatePersonalData({
     required String name,
+    required apellidos,
     String? birthDate,
     int? stateId,
     int? cityId,
@@ -85,6 +81,7 @@ class UserRepository {
   }) async {
     await _helper.post(path: '/user/update', body: {
       'name': name,
+      'apellidos': name,
       if (birthDate != null) 'birth_date': birthDate,
       if (stateId != null) 'state_id': stateId,
       if (cityId != null) 'city_id': cityId,

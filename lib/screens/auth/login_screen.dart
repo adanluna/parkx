@@ -170,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login(BuildContext context) {
     context.loaderOverlay.show();
-    UserRepository().login(username: emailController.text, password: passwordController.text, remember: true).then((value) async {
+    UserRepository().login(email: emailController.text, password: passwordController.text).then((value) async {
       _getUserData(context);
     }, onError: (error) {
       context.loaderOverlay.hide();

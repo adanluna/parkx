@@ -19,15 +19,15 @@ class PersonalDataUpdateScreen extends StatefulWidget {
 }
 
 class _PersonalDataUpdateScreenState extends State<PersonalDataUpdateScreen> {
-  final User user = AccountManager.instance.user;
+  final User? user = AccountManager.instance.user;
   final _formKey = GlobalKey<FormState>();
   TextEditingController nombreController = TextEditingController();
   TextEditingController apellidosController = TextEditingController();
 
   @override
   void initState() {
-    nombreController.text = user.firstName;
-    apellidosController.text = user.lastName;
+    nombreController.text = user!.firstName;
+    apellidosController.text = user!.lastName;
     super.initState();
   }
 
@@ -156,7 +156,7 @@ class _PersonalDataUpdateScreenState extends State<PersonalDataUpdateScreen> {
 
   void _goUpdate(BuildContext context) {
     context.loaderOverlay.show();
-    UserRepository().updatePersonalData(nombre: nombreController.text, apellidos: apellidosController.text).then((value) async {
+    UserRepository().updatePersonalData(name: nombreController.text, apellidos: apellidosController.text).then((value) async {
       context.loaderOverlay.hide();
       _getUserData(context);
     }, onError: (error) {

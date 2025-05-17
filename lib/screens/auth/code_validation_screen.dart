@@ -10,7 +10,9 @@ import 'package:otp_text_field/style.dart';
 import 'package:otp_timer_button/otp_timer_button.dart';
 
 class CodeValidationScreen extends StatefulWidget {
-  const CodeValidationScreen({super.key});
+  final String email;
+
+  const CodeValidationScreen({super.key, required this.email});
 
   static const routeName = '/code_validation';
 
@@ -135,7 +137,7 @@ class _CodeValidationScreenState extends State<CodeValidationScreen> {
 
   void _validate(BuildContext context, verificationCode) {
     context.loaderOverlay.show();
-    UserRepository().confirmCode(email: email, code: verificationCode).then((value) async {
+    UserRepository().confirmCode(email: widget.email, code: verificationCode).then((value) async {
       context.loaderOverlay.hide();
       showSuccessDialog(context, message: 'Cuenta validadada, usa tu correo y contraseña para entrar');
       _goLogin();

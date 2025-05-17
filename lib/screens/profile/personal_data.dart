@@ -16,7 +16,7 @@ class PersonalDataScreen extends StatefulWidget {
 }
 
 class _PersonalDataScreenState extends State<PersonalDataScreen> {
-  final User user = AccountManager.instance.user;
+  final User? user = AccountManager.instance.user;
 
   @override
   void initState() {
@@ -50,8 +50,8 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                         decoration: boxDecoration(),
                         child: Column(
                           children: [
-                            _row('Nombre', '${user.firstName} ${user.lastName}'),
-                            _row('Correo electrónico', user.email),
+                            _row('Nombre', '${user?.firstName} ${user?.lastName}'),
+                            _row('Correo electrónico', user!.email),
                             _row('Género', 'Completar'),
                             _row('Cumpleaños', 'Completar'),
                           ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:parkx/api/user_repository.dart';
+import 'package:parkx/utils/account_manager.dart';
 import 'package:parkx/utils/dialogs.dart';
 import 'package:parkx/widgets/logo_background.dart';
 import 'package:parkx/utils/app_theme.dart';
@@ -196,7 +197,9 @@ class _PasswordValidationScreenState extends State<PasswordValidationScreen> {
 
   void _validate(BuildContext context) {
     context.loaderOverlay.show();
-    UserRepository().recoveryPasswordStep2(key: verificationCode, password: passwordController.text).then((value) async {
+    UserRepository()
+        .recoveryPasswordStep2(token: verificationCode, password: passwordController.text, email: AccountManager.instance.user!.email)
+        .then((value) async {
       context.loaderOverlay.hide();
       showSuccessDialog(context, message: 'Contraseña actualizada', onDismiss: () {
         Navigator.of(context).pushReplacementNamed('/login');

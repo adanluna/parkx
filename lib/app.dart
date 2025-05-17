@@ -101,7 +101,7 @@ class _MyAppState extends State<MyApp> {
                       case RegisterScreen.routeName:
                         return const RegisterScreen();
                       case CodeValidationScreen.routeName:
-                        return const CodeValidationScreen();
+                        return CodeValidationScreen(email: arguments?['email'] as String);
                       case PasswordRecoveryScreen.routeName:
                         return const PasswordRecoveryScreen();
                       case PasswordValidationScreen.routeName:
