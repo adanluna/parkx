@@ -84,6 +84,7 @@ class _MyAppState extends State<MyApp> {
               builder: EasyLoading.init(),
               supportedLocales: const [Locale('es', ''), Locale('en', '')],
               theme: AppTheme.theme,
+              themeMode: ThemeMode.light,
               title: "Parkx",
               onGenerateRoute: (RouteSettings settings) {
                 final arguments = (settings.arguments != null) ? settings.arguments as Map<String, dynamic> : null;

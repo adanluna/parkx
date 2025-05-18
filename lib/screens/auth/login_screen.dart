@@ -174,7 +174,8 @@ class _LoginScreenState extends State<LoginScreen> {
       _getUserData(context);
     }, onError: (error) {
       context.loaderOverlay.hide();
-      showErrorDialog(context, message: error.message);
+      //showErrorDialog(context, message: error.message);
+      print(error.toString());
     });
   }
 

@@ -4,9 +4,7 @@ import 'package:parkx/api/user_repository.dart';
 import 'package:parkx/utils/dialogs.dart';
 import 'package:parkx/widgets/logo_background.dart';
 import 'package:parkx/utils/app_theme.dart';
-import 'package:otp_text_field/otp_field.dart';
-import 'package:otp_text_field/otp_text_field.dart';
-import 'package:otp_text_field/style.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:otp_timer_button/otp_timer_button.dart';
 
 class CodeValidationScreen extends StatefulWidget {
@@ -22,7 +20,7 @@ class CodeValidationScreen extends StatefulWidget {
 
 class _CodeValidationScreenState extends State<CodeValidationScreen> {
   OtpTimerButtonController controller = OtpTimerButtonController();
-  OtpFieldController otpController = OtpFieldController();
+  TextEditingController otpController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -69,23 +67,29 @@ class _CodeValidationScreenState extends State<CodeValidationScreen> {
                               Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
                                   child: Text(
-                                      'Por tu seguridad te enviamos un código de 4 dígitos a tu correo electrónico, este puede tardar hasta 1 minuto en llegar.',
+                                      'Por tu seguridad te enviamos un código de 5 dígitos a tu correo electrónico, este puede tardar hasta 1 minuto en llegar.',
                                       textAlign: TextAlign.center,
                                       style: AppTheme.theme.textTheme.bodyMedium)),
                               Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 15),
-                                  child: OTPTextField(
-                                      controller: otpController,
-                                      length: 4,
-                                      width: MediaQuery.of(context).size.width,
-                                      textFieldAlignment: MainAxisAlignment.spaceEvenly,
+                                  child: PinCodeTextField(
+                                    appContext: context,
+                                    length: 5,
+                                    controller: otpController,
+                                    animationType: AnimationType.fade,
+                                    pinTheme: PinTheme(
+                                      shape: PinCodeFieldShape.box,
+                                      borderRadius: BorderRadius.circular(10),
+                                      fieldHeight: 50,
                                       fieldWidth: 50,
-                                      fieldStyle: FieldStyle.box,
-                                      outlineBorderRadius: 10,
-                                      style: const TextStyle(fontSize: 40),
-                                      onCompleted: (verificationCode) {
-                                        _validate(context, verificationCode);
-                                      })),
+                                      activeFillColor: Colors.white,
+                                    ),
+                                    textStyle: const TextStyle(fontSize: 40),
+                                    onCompleted: (verificationCode) {
+                                      _validate(context, verificationCode);
+                                    },
+                                    onChanged: (value) {},
+                                  )),
                               Column(
                                 children: [
                                   SizedBox(
@@ -135,16 +139,19 @@ class _CodeValidationScreenState extends State<CodeValidationScreen> {
     }));
   }
 
-  void _validate(BuildContext context, verificationCode) {
+  void _validate(BuildContext context, verificationCode) async {
     context.loaderOverlay.show();
-    UserRepository().confirmCode(email: widget.email, code: verificationCode).then((value) async {
+    try {
+      await UserRepository().confirmCode(email: widget.email, code: verificationCode);
+      if (!mounted) return;
       context.loaderOverlay.hide();
-      showSuccessDialog(context, message: 'Cuenta validadada, usa tu correo y contraseña para entrar');
+      showSuccessDialog(context, message: 'Cuenta validada, usa tu correo y contraseña para entrar');
       _goLogin();
-    }, onError: (error) {
+    } catch (error) {
+      if (!mounted) return;
       context.loaderOverlay.hide();
-      showErrorDialog(context, message: error.message);
-    });
+      showErrorDialog(context, message: error is Exception && (error as dynamic).message != null ? (error as dynamic).message : error.toString());
+    }
   }
 
   void _goLogin() {

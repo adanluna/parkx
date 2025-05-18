@@ -25,6 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController passwordController = TextEditingController();
   final GlobalKey<FlutterPwValidatorState> validatorKey = GlobalKey<FlutterPwValidatorState>();
   bool passwordPass = false;
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -128,8 +129,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             controller: passwordController,
                                             style: AppTheme.theme.textTheme.bodyMedium,
                                             keyboardType: TextInputType.visiblePassword,
-                                            obscureText: true,
-                                            decoration: const InputDecoration(labelText: "Contraseña"),
+                                            obscureText: _obscurePassword,
+                                            decoration: InputDecoration(
+                                              labelText: "Contraseña",
+                                              suffixIcon: IconButton(
+                                                icon: Icon(
+                                                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _obscurePassword = !_obscurePassword;
+                                                  });
+                                                },
+                                              ),
+                                            ),
                                             validator: (value) {
                                               if (value == null || value.isEmpty) {
                                                 return 'Proporciona una contraseña';
@@ -171,7 +184,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16.0),
                                             child: ElevatedButton(
                                               style: AppTheme.theme.elevatedButtonTheme.style!
-                                                  .copyWith(backgroundColor: MaterialStateProperty.all(AppTheme.accentColor)),
+                                                  .copyWith(backgroundColor: WidgetStateProperty.all(AppTheme.accentColor)),
                                               onPressed: () {
                                                 if (_formKey.currentState!.validate() && passwordPass) {
                                                   _create(context);
@@ -224,16 +237,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _create(BuildContext context) {
     context.loaderOverlay.show();
-    UserRepository()
-        .register(email: emailController.text, nombre: nombreController.text, apellidos: apellidoController.text, password: passwordController.text)
-        .then((value) async {
-      //analitycs.registerSignUp('Email');
+    try {
+      UserRepository()
+          .register(email: emailController.text, nombre: nombreController.text, apellidos: apellidoController.text, password: passwordController.text)
+          .then((value) async {
+        //analitycs.registerSignUp('Email');
+        context.loaderOverlay.hide();
+        _goCodeValidation();
+      }, onError: (error) {
+        context.loaderOverlay.hide();
+        showErrorDialog(context, message: error.message);
+      });
+    } catch (e) {
       context.loaderOverlay.hide();
-      _goCodeValidation();
-    }, onError: (error) {
-      context.loaderOverlay.hide();
-      showErrorDialog(context, message: error.message);
-    });
+      showErrorDialog(context, message: e.toString());
+    }
   }
 
   void _goLogin() {

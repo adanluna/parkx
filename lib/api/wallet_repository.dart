@@ -1,6 +1,5 @@
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:parkx/api/config/api_base_helper.dart';
-import 'package:parkx/api/config/api_exception.dart';
 import 'package:parkx/models/user.dart';
 import 'package:parkx/models/wallet.dart';
 import 'package:parkx/models/wallet_transfer.dart';
@@ -12,9 +11,9 @@ class WalletRepository {
 
   Future<Wallet?> wallet() async {
     try {
-      final response = await _helper.get(path: '/mobile/wallet');
+      final response = await _helper.get(path: '/wallets/${user!.id}');
       return Wallet.fromJSON(response);
-    } on UnauthorizedException catch (_) {
+    } catch (e) {
       return null;
     }
   }
@@ -23,7 +22,7 @@ class WalletRepository {
     try {
       final response = await _helper.get(path: '/mobile/wallet/funding-info');
       return WalletTransfer.fromJSON(response);
-    } on UnauthorizedException catch (_) {
+    } catch (e) {
       return null;
     }
   }
@@ -31,9 +30,9 @@ class WalletRepository {
   Future<bool> initOxxoPayment() async {
     try {
       final response = await _helper.get(path: '/mobile/wallet/payment/oxxo');
-      final clientSecret = response['clientSecret'];
-      final customerSessionClientSecret = response['customerSessionClientSecret'];
-    } on UnauthorizedException catch (_) {
+      //final clientSecret = response['clientSecret'];
+      //final customerSessionClientSecret = response['customerSessionClientSecret'];
+    } catch (e) {
       return false;
     }
     return true;
@@ -41,7 +40,6 @@ class WalletRepository {
 
   Future<bool> saveCreditCard() async {
     final response = await _helper.get(path: '/mobile/wallet/create-card-init');
-    //{clientSecret: seti_1Px9sEDFtmWA3nAxYEpMu6Nt_secret_QonTwKqiOacZ0fa8q6bBQEjH0xVyvMG, customerSessionClientSecret: cuss_secret_QonTRwAn3zLIEEF7GyvNhln2xhTr3iwRo36KLiT8j4oKnSb}
     final clientSecret = response['clientSecret'];
 
     final billingDetails = BillingDetails(
@@ -67,7 +65,7 @@ class WalletRepository {
         paymentIntentClientSecret: clientSecret,
       );
       return true;
-    } on UnauthorizedException catch (_) {
+    } catch (e) {
       return false;
     }
   }

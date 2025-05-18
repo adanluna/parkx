@@ -1,16 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:parkx/utils/account_manager.dart';
 import 'package:parkx/utils/flavor_config.dart';
-import 'api_exception.dart';
 
 class ApiBaseHelper {
-  late Dio _dio;
+  static final ApiBaseHelper _instance = ApiBaseHelper._internal();
+  late final Dio _dio;
 
-  ApiBaseHelper() {
+  factory ApiBaseHelper() {
+    return _instance;
+  }
+
+  ApiBaseHelper._internal() {
     final flavor = FlavorConfig.instance.values;
-
     BaseOptions options = BaseOptions(
-      baseUrl: "${flavor.scheme}://${flavor.hostName}:${flavor.port}/api",
+      baseUrl: "${flavor.scheme}://${flavor.hostName}/api",
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(seconds: 20),
       headers: {
@@ -18,7 +21,6 @@ class ApiBaseHelper {
         'Content-Type': 'application/json',
       },
     );
-
     _dio = Dio(options);
   }
 
@@ -27,6 +29,10 @@ class ApiBaseHelper {
   Future<dynamic> post({required String path, Map<String, dynamic>? body}) => _request('POST', path, data: body);
 
   Future<dynamic> patch({required String path, Map<String, dynamic>? body}) => _request('PATCH', path, data: body);
+
+  Future<dynamic> delete({required String path, Map<String, dynamic>? body}) => _request('DELETE', path, data: body);
+
+  Future<dynamic> put({required String path, Map<String, dynamic>? body}) => _request('PUT', path, data: body);
 
   Future<dynamic> _request(
     String method,
@@ -48,29 +54,32 @@ class ApiBaseHelper {
         queryParameters: queryParameters,
         options: Options(method: method),
       );
-
       return response.data;
     } on DioException catch (e) {
-      return _handleError(e);
+      if (e.response?.statusCode == 403 || e.response?.statusCode == 422 || e.response?.statusCode == 401) {
+        throw ForbiddenException(e.response?.data);
+      }
+      print('Status code: ${e.response?.statusCode}');
+      print(e.response?.data);
+      throw Exception(
+        'Status code: ${e.response?.statusCode}\n'
+        '${e.response?.data}',
+      );
+    } catch (e) {
+      throw Exception('Error inesperado: $e');
     }
   }
+}
 
-  dynamic _handleError(DioException e) {
-    final statusCode = e.response?.statusCode;
-    final responseData = e.response?.data;
+class ForbiddenException implements Exception {
+  final dynamic response;
+  ForbiddenException(this.response);
 
-    switch (statusCode) {
-      case 400:
-        throw BadRequestException(responseJson: responseData);
-      case 401:
-      case 403:
-        throw UnauthorizedException(responseJson: responseData);
-      case 422:
-        throw FailValidationRequestException(responseJson: responseData);
-      case 500:
-        throw InternalErrorException(responseJson: responseData);
-      default:
-        throw FetchDataException();
+  String get message {
+    // Ajusta según la estructura de tu backend
+    if (response is Map && response['message'] != null) {
+      return response['message'];
     }
+    return response.toString();
   }
 }

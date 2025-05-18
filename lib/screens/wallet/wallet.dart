@@ -159,7 +159,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
-              Column(
+              /*Column(
                 children: walletProvider.wallet!.cards!.map((CreditCard card) {
                   return SizedBox(
                     width: double.infinity,
@@ -179,7 +179,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '${card.brand.toUpperCase()}/****${card.last4}',
+                                        '${card.brand.toUpperCase()}/----${card.last4}',
                                         style: const TextStyle(
                                             color: AppTheme.primaryColor, fontFamily: 'Roboto', fontSize: 13, fontWeight: FontWeight.bold),
                                       ),
@@ -199,7 +199,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     ),
                   );
                 }).toList(),
-              ),
+              ),*/
               ButtonSecondary(title: 'Añadir tarjeta', function: _goCreditCardAdd),
             ],
           ),

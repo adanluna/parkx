@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:parkx/api/user_repository.dart';
 import 'package:parkx/providers/wallet_provider.dart';
 import 'package:parkx/utils/account_manager.dart';
 import 'package:parkx/utils/app_theme.dart';
@@ -82,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         message: '¿Quieres cerrar sesión?',
         onCancel: () => Navigator.of(context).pop(),
         onConfirm: () async {
-          await AccountManager.instance.clearAuth();
+          await UserRepository().logout();
           walletProvider.clear();
           Navigator.of(context).pushReplacementNamed('/login');
         });

@@ -6,9 +6,7 @@ import 'package:parkx/utils/account_manager.dart';
 import 'package:parkx/utils/dialogs.dart';
 import 'package:parkx/widgets/logo_background.dart';
 import 'package:parkx/utils/app_theme.dart';
-import 'package:otp_text_field/otp_field.dart';
-import 'package:otp_text_field/otp_text_field.dart';
-import 'package:otp_text_field/style.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:otp_timer_button/otp_timer_button.dart';
 import 'package:parkx/utils/password_strings.dart';
 
@@ -24,7 +22,7 @@ class PasswordValidationScreen extends StatefulWidget {
 class _PasswordValidationScreenState extends State<PasswordValidationScreen> {
   final _formKey = GlobalKey<FormState>();
   OtpTimerButtonController controller = OtpTimerButtonController();
-  OtpFieldController otpController = OtpFieldController();
+  TextEditingController otpController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   final GlobalKey<FlutterPwValidatorState> validatorKey = GlobalKey<FlutterPwValidatorState>();
   bool passwordPass = false;
@@ -81,21 +79,28 @@ class _PasswordValidationScreenState extends State<PasswordValidationScreen> {
                                           textAlign: TextAlign.center,
                                           style: AppTheme.theme.textTheme.bodyMedium)),
                                   Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 15),
-                                      child: OTPTextField(
-                                          controller: otpController,
-                                          length: 4,
-                                          width: MediaQuery.of(context).size.width,
-                                          textFieldAlignment: MainAxisAlignment.spaceEvenly,
-                                          fieldWidth: 50,
-                                          fieldStyle: FieldStyle.box,
-                                          outlineBorderRadius: 10,
-                                          style: const TextStyle(fontSize: 40),
-                                          onCompleted: (code) {
-                                            setState(() {
-                                              verificationCode = code;
-                                            });
-                                          })),
+                                    padding: const EdgeInsets.symmetric(vertical: 15),
+                                    child: PinCodeTextField(
+                                      appContext: context,
+                                      length: 4,
+                                      controller: otpController,
+                                      animationType: AnimationType.fade,
+                                      pinTheme: PinTheme(
+                                        shape: PinCodeFieldShape.box,
+                                        borderRadius: BorderRadius.circular(10),
+                                        fieldHeight: 50,
+                                        fieldWidth: 50,
+                                        activeFillColor: Colors.white,
+                                      ),
+                                      textStyle: const TextStyle(fontSize: 40),
+                                      onChanged: (value) {},
+                                      onCompleted: (code) {
+                                        setState(() {
+                                          verificationCode = code;
+                                        });
+                                      },
+                                    ),
+                                  ),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 30, right: 30, top: 15, bottom: 10),
                                     child: TextFormField(

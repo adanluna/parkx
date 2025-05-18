@@ -1,5 +1,5 @@
 import 'package:parkx/api/config/api_base_helper.dart';
-import 'package:parkx/api/config/api_exception.dart';
+
 import 'package:parkx/models/state.dart';
 import 'package:parkx/models/parking.dart';
 
@@ -10,7 +10,8 @@ class ParkingRepository {
     try {
       final response = await _helper.get(path: '/mobile/estados');
       return List.from(response.map((e) => StateModel.fromJSON(e)));
-    } on UnauthorizedException catch (_) {
+    } catch (e) {
+      // Puedes agregar lógica específica si el error es de autorización
       return null;
     }
   }
@@ -22,7 +23,8 @@ class ParkingRepository {
         'municipioId': municipioId,
       });
       return List.from(response.map((e) => Parking.fromJSON(e)));
-    } on UnauthorizedException catch (_) {
+    } catch (e) {
+      // Puedes agregar lógica específica si el error es de autorización
       return null;
     }
   }
@@ -31,7 +33,8 @@ class ParkingRepository {
     try {
       final response = await _helper.post(path: '/mobile/estacionamientos/encontrar', body: {"latitud": lat, "longitud": lng});
       return List.from(response.map((e) => Parking.fromJSON(e)));
-    } on UnauthorizedException catch (_) {
+    } catch (e) {
+      // Puedes agregar lógica específica si el error es de autorización
       return null;
     }
   }
