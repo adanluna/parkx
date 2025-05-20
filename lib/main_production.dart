@@ -16,7 +16,7 @@ Future<void> main() async {
     FlavorConfig(
       flavor: Flavor.staging,
       //values: const FlavorValues(appName: parkxAppName, hostName: 'vps-10121c7f.vps.ovh.ca', scheme: 'https'),
-      values: const FlavorValues(appName: parkxAppName, hostName: '127.0.0.1', scheme: 'http'),
+      values: const FlavorValues(appName: parkxAppName, hostName: '192.168.1.153', scheme: 'http'),
     );
     runApp(const MyApp());
   });

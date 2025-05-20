@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'dart:io';
 import 'package:parkx/utils/account_manager.dart';
 import 'package:parkx/utils/flavor_config.dart';
 
@@ -55,16 +56,21 @@ class ApiBaseHelper {
         options: Options(method: method),
       );
       return response.data;
+    } on SocketException catch (e) {
+      // Captura errores de red como conexión rechazada
+      throw Exception('Error de red: ${e.message}');
     } on DioException catch (e) {
       if (e.response?.statusCode == 403 || e.response?.statusCode == 422 || e.response?.statusCode == 401) {
         throw ForbiddenException(e.response?.data);
+      } else if (e.response?.statusCode == 500) {
+        throw Exception('Error en el servidor: ${e.response?.data}');
+      } else if (e.response?.statusCode == 404) {
+        throw Exception('Recurso no encontrado: ${e.response?.data}');
+      } else if (e.response?.statusCode == 400) {
+        throw Exception('Error de solicitud: ${e.response?.data}');
+      } else {
+        throw Exception(e.toString());
       }
-      print('Status code: ${e.response?.statusCode}');
-      print(e.response?.data);
-      throw Exception(
-        'Status code: ${e.response?.statusCode}\n'
-        '${e.response?.data}',
-      );
     } catch (e) {
       throw Exception('Error inesperado: $e');
     }

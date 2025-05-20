@@ -63,6 +63,11 @@
 		<array>
 			<string>es</string>
 			<string>en</string>
-		</array>		
+		</array>
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true />
+		</dict>
 	</dict>
 </plist>

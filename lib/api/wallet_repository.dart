@@ -29,7 +29,7 @@ class WalletRepository {
 
   Future<bool> initOxxoPayment() async {
     try {
-      final response = await _helper.get(path: '/mobile/wallet/payment/oxxo');
+      await _helper.get(path: '/mobile/wallet/payment/oxxo');
       //final clientSecret = response['clientSecret'];
       //final customerSessionClientSecret = response['customerSessionClientSecret'];
     } catch (e) {
@@ -42,26 +42,16 @@ class WalletRepository {
     final response = await _helper.get(path: '/mobile/wallet/create-card-init');
     final clientSecret = response['clientSecret'];
 
-    final billingDetails = BillingDetails(
-      email: user?.email,
-    );
+    final billingDetails = BillingDetails(email: user?.email);
     if (user?.email == null) {
       throw Exception('El usuario no tiene un correo electrónico registrado.');
     }
     try {
       await Stripe.instance.createPaymentMethod(
-        params: PaymentMethodParams.card(
-          paymentMethodData: PaymentMethodData(
-            billingDetails: billingDetails,
-          ),
-        ),
+        params: PaymentMethodParams.card(paymentMethodData: PaymentMethodData(billingDetails: billingDetails)),
       );
       await Stripe.instance.confirmSetupIntent(
-        params: PaymentMethodParams.card(
-          paymentMethodData: PaymentMethodData(
-            billingDetails: billingDetails,
-          ),
-        ),
+        params: PaymentMethodParams.card(paymentMethodData: PaymentMethodData(billingDetails: billingDetails)),
         paymentIntentClientSecret: clientSecret,
       );
       return true;

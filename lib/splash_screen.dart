@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:parkx/api/user_repository.dart';
+import 'package:parkx/providers/parkings_provider.dart';
 import 'package:parkx/utils/account_manager.dart';
 import 'package:parkx/utils/dialogs.dart';
 import 'package:parkx/utils/wallet_functions.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:parkx/utils/estado_utils.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -37,22 +40,18 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: FutureBuilder<int>(
-            future: _showIntro,
-            builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-              return Container(
-                decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF3422B8),
-                    Color(0xFF170F52),
-                  ],
-                )),
-                child: const Center(child: SizedBox(child: Image(image: AssetImage('assets/images/logo.png')))),
-              );
-            }));
+      child: FutureBuilder<int>(
+        future: _showIntro,
+        builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+          return Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF3422B8), Color(0xFF170F52)]),
+            ),
+            child: const Center(child: SizedBox(child: Image(image: AssetImage('assets/images/logo.png')))),
+          );
+        },
+      ),
+    );
   }
 
   void _gotoIntro() async {
@@ -69,17 +68,23 @@ class _SplashScreenState extends State<SplashScreen> {
     try {
       final token = await AccountManager.instance.getToken();
       if (token != null) {
-        UserRepository().getCurrentUser().then((user) async {
-          if (user != null) {
-            await getWallet(context);
-            if (!mounted) return;
-            Navigator.of(context).pushReplacementNamed('/home');
-          } else {
+        UserRepository().getCurrentUser().then(
+          (user) async {
+            if (user != null) {
+              if (!mounted) return;
+
+              await getWallet(context);
+              await Provider.of<ParkingsProvider>(context, listen: false).fetchEstados();
+              await seleccionarYActualizarEstado(context);
+              Navigator.of(context).pushReplacementNamed('/home');
+            } else {
+              _goLogin();
+            }
+          },
+          onError: (_) {
             _goLogin();
-          }
-        }, onError: (_) {
-          _goLogin();
-        });
+          },
+        );
       } else {
         _goLogin();
       }
