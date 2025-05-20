@@ -1,13 +1,12 @@
 class Pregunta {
-  String texto;
-  String titulo;
+  final int id;
+  final String titulo;
+  final String texto;
+  final int seccionId;
 
-  Pregunta({this.texto = '', this.titulo = ''});
+  Pregunta({required this.id, required this.titulo, required this.texto, required this.seccionId});
 
-  factory Pregunta.fromJSON(Map<String, dynamic> json) {
-    return Pregunta(
-      texto: json["texto"],
-      titulo: json["titulo"],
-    );
+  factory Pregunta.fromJson(Map<String, dynamic> json) {
+    return Pregunta(id: json['id'], titulo: json['titulo'], texto: json['texto'], seccionId: json['pregunta_seccion_id']);
   }
 }

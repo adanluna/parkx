@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:parkx/providers/parking_provider.dart';
 import 'package:parkx/providers/parkings_provider.dart';
+import 'package:parkx/providers/preguntas_provider.dart';
 import 'package:parkx/providers/wallet_provider.dart';
 import 'package:parkx/screens/auth/code_validation_screen.dart';
 import 'package:parkx/screens/auth/password_recovery_screen.dart';
@@ -74,6 +75,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider<ParkingProvider>(create: (_) => ParkingProvider()),
           ChangeNotifierProvider<WalletProvider>(create: (_) => WalletProvider()),
           ChangeNotifierProvider<ParkingsProvider>(create: (_) => ParkingsProvider()),
+          ChangeNotifierProvider(create: (_) => PreguntasProvider()),
         ],
         builder: (BuildContext context, Widget? child) {
           return MaterialApp(

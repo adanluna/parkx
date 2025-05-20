@@ -74,7 +74,6 @@ class _SplashScreenState extends State<SplashScreen> {
               if (!mounted) return;
 
               await getWallet(context);
-              await Provider.of<ParkingsProvider>(context, listen: false).fetchEstados();
               await seleccionarYActualizarEstado(context);
               Navigator.of(context).pushReplacementNamed('/home');
             } else {
