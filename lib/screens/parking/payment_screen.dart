@@ -192,7 +192,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Saldo Prepago:'),
-                    Text('\$${_convertoMoney((walletProvider.wallet?.balance ?? 0).toInt())}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                    Text(
+                      '\$${_convertoMoney((walletProvider.wallet?.balance ?? 0).toInt())}',
+                      style: TextStyle(
+                        color: (walletProvider.wallet!.balance < totalAPagar) ? Colors.red : Colors.black,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
               ),
