@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +90,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   child: TextFormField(
                                                     controller: passwordController,
                                                     style: AppTheme.theme.textTheme.bodyMedium,
-                                                    obscureText: true,
-                                                    decoration: const InputDecoration(labelText: "Contraseña"),
+                                                    obscureText: _obscurePassword,
+                                                    decoration: InputDecoration(
+                                                      labelText: "Contraseña",
+                                                      suffixIcon: IconButton(
+                                                        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            _obscurePassword = !_obscurePassword;
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
                                                     validator: (value) {
                                                       if (value == null || value.isEmpty) {
                                                         return 'Proporciona una contraseña';

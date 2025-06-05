@@ -17,10 +17,7 @@ class ApiBaseHelper {
       baseUrl: "${flavor.scheme}://${flavor.hostName}/api",
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(seconds: 20),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
+      headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
     );
     _dio = Dio(options);
   }
@@ -35,12 +32,7 @@ class ApiBaseHelper {
 
   Future<dynamic> put({required String path, Map<String, dynamic>? body}) => _request('PUT', path, data: body);
 
-  Future<dynamic> _request(
-    String method,
-    String path, {
-    Map<String, dynamic>? queryParameters,
-    Map<String, dynamic>? data,
-  }) async {
+  Future<dynamic> _request(String method, String path, {Map<String, dynamic>? queryParameters, Map<String, dynamic>? data}) async {
     try {
       final token = await AccountManager.instance.getToken();
       if (token != null) {
@@ -49,12 +41,7 @@ class ApiBaseHelper {
         _dio.options.headers.remove('Authorization');
       }
 
-      final response = await _dio.request(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: Options(method: method),
-      );
+      final response = await _dio.request(path, data: data, queryParameters: queryParameters, options: Options(method: method));
       return response.data;
     } on SocketException catch (e) {
       // Captura errores de red como conexión rechazada
@@ -67,6 +54,8 @@ class ApiBaseHelper {
       } else if (e.response?.statusCode == 404) {
         throw Exception('Recurso no encontrado: ${e.response?.data}');
       } else if (e.response?.statusCode == 400) {
+        throw Exception('Error de solicitud: ${e.response?.data}');
+      } else if (e.response?.statusCode == 402) {
         throw Exception('Error de solicitud: ${e.response?.data}');
       } else {
         throw Exception(e.toString());

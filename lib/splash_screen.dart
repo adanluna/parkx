@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:parkx/api/user_repository.dart';
-import 'package:parkx/providers/parkings_provider.dart';
 import 'package:parkx/utils/account_manager.dart';
 import 'package:parkx/utils/dialogs.dart';
 import 'package:parkx/utils/wallet_functions.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parkx/utils/estado_utils.dart';
 

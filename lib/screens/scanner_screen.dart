@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:parkx/providers/parking_provider.dart';
 import 'package:parkx/utils/app_theme.dart';
-import 'package:parkx/utils/dialogs.dart';
 import 'package:parkx/widgets/button_secondary.dart';
 import 'package:parkx/widgets/logo_background_padding.dart';
-import 'package:provider/provider.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -45,7 +42,6 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final parkingProvier = Provider.of<ParkingProvider>(context);
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -78,46 +74,46 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Estacionamiento', style: AppTheme.theme.textTheme.bodySmall!.copyWith(fontWeight: FontWeight.bold)),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: ButtonSecondary(title: 'Captura Manual', function: _goManualScanner),
+                      ),
+                      /*Text('Estacionamiento', style: AppTheme.theme.textTheme.bodySmall!.copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 10),
                       GestureDetector(
                         onTap: () {
                           _goParkingSearch();
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppTheme.gray, width: 1),
-                              borderRadius: const BorderRadius.all(Radius.circular(10)),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(
-                                  width: 270,
-                                  child: Text(
-                                    (parkingProvier.selected) ? parkingProvier.parking.nombre : estacionamiento,
-                                    style: AppTheme.theme.textTheme.bodySmall,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppTheme.gray, width: 1),
+                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                width: 270,
+                                child: Text(
+                                  (parkingProvier.selected) ? parkingProvier.parking.nombre : estacionamiento,
+                                  style: AppTheme.theme.textTheme.bodySmall,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                const Icon(Icons.arrow_forward, size: 23, color: Colors.black),
-                              ],
-                            ),
+                              ),
+                              const Icon(Icons.edit, size: 23, color: Colors.black),
+                            ],
                           ),
                         ),
-                      ),
-                      ButtonSecondary(title: 'Captura Manual', function: _goManualScanner),
-                      Row(
+                      ),*/
+                      /*Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           GestureDetector(onTap: _goNotFound, child: Text('No Parking', style: AppTheme.theme.textTheme.bodySmall)),
                           GestureDetector(onTap: _goNoTicket, child: Text('No ticket', style: AppTheme.theme.textTheme.bodySmall)),
                           GestureDetector(onTap: _goError, child: Text('Error Parking', style: AppTheme.theme.textTheme.bodySmall)),
                         ],
-                      ),
+                      ),*/
                     ],
                   ),
                 ),
@@ -141,6 +137,19 @@ class _ScannerScreenState extends State<ScannerScreen> {
               ),
               iconSize: 30,
               icon: Icon((!isFlashOn) ? Icons.lightbulb : Icons.lightbulb_outline, color: AppTheme.primaryColor),
+            ),
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: Border.all(color: Colors.transparent, width: 1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: CustomPaint(painter: _CornersPainter()),
             ),
           ),
         ],
@@ -171,55 +180,29 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 
   void _onCodeDetected(String code) async {
-    final parkingProvier = Provider.of<ParkingProvider>(context, listen: false);
     setState(() {
       this.code = code;
       isScanned = true;
     });
-    if (!parkingProvier.selected) {
-      showErrorDialog(
-        context,
-        message: 'Necesitas seleccionar un estacionamiento',
-        onConfirm: () {
-          Navigator.of(context).pop();
-          setState(() {
-            isScanned = false;
-          });
-          //_goParkingSearch();
-        },
-      );
-    } else {
-      _goPayment();
-    }
+    _goPayment();
   }
 
   void _goManualScanner() async {
+    _goParkingSearch(true, '');
+    //await Navigator.of(context).pushNamed('/manual_scanner');
+  }
+
+  void _goPayment() async {
+    _goParkingSearch(false, code as String);
+    //Navigator.of(context).pushNamed('/payment', arguments: {'code': code as String});
+  }
+
+  void _goParkingSearch(bool manual, String code) async {
     await mobileScannerController.stop();
-    final parkingProvier = Provider.of<ParkingProvider>(context, listen: false);
-    if (!parkingProvier.selected) {
-      _goParkingSearch();
-    } else {
-      await Navigator.of(context).pushNamed('/manual_scanner');
-      await mobileScannerController.start();
-    }
+    Navigator.of(context).pushNamed('/parking_search', arguments: {'manual': manual, 'code': code});
   }
 
-  void _goPayment() {
-    Navigator.of(context).pushNamed('/payment', arguments: {'code': code as String});
-  }
-
-  void _goParkingSearch() async {
-    await mobileScannerController.stop();
-    var response = await Navigator.of(context).pushNamed('/parking_search');
-    await mobileScannerController.start();
-    if (response != '') {
-      setState(() {
-        estacionamiento = response as String;
-      });
-    }
-  }
-
-  void _goNotFound() async {
+  /*void _goNotFound() async {
     await mobileScannerController.stop();
     final parkingProvier = Provider.of<ParkingProvider>(context, listen: false);
     if (!parkingProvier.selected) {
@@ -250,5 +233,35 @@ class _ScannerScreenState extends State<ScannerScreen> {
       await Navigator.of(context).pushNamed('/error_parking');
       await mobileScannerController.start();
     }
+  }*/
+}
+
+class _CornersPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint =
+        Paint()
+          ..color = Colors.white
+          ..strokeWidth = 4
+          ..style = PaintingStyle.stroke;
+
+    const cornerLength = 34.0;
+
+    // Esquinas
+    // Superior izquierda
+    canvas.drawLine(Offset(0, 0), Offset(cornerLength, 0), paint);
+    canvas.drawLine(Offset(0, 0), Offset(0, cornerLength), paint);
+    // Superior derecha
+    canvas.drawLine(Offset(size.width, 0), Offset(size.width - cornerLength, 0), paint);
+    canvas.drawLine(Offset(size.width, 0), Offset(size.width, cornerLength), paint);
+    // Inferior izquierda
+    canvas.drawLine(Offset(0, size.height), Offset(0, size.height - cornerLength), paint);
+    canvas.drawLine(Offset(0, size.height), Offset(cornerLength, size.height), paint);
+    // Inferior derecha
+    canvas.drawLine(Offset(size.width, size.height), Offset(size.width - cornerLength, size.height), paint);
+    canvas.drawLine(Offset(size.width, size.height), Offset(size.width, size.height - cornerLength), paint);
   }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

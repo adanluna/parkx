@@ -15,10 +15,12 @@ Future<Estado?> seleccionarYActualizarEstado(BuildContext context) async {
   final estadoId = await AccountManager.instance.getEstadoId();
   Estado? estadoSeleccionado;
 
-  if (estadoId != null) {
+  if (estadoId != null && parkingsProvider.estados.isNotEmpty) {
     estadoSeleccionado = parkingsProvider.estados.firstWhere((e) => e.id == estadoId, orElse: () => parkingsProvider.estados[0]);
+  } else if (parkingsProvider.estados.isNotEmpty) {
+    estadoSeleccionado = parkingsProvider.estados[0];
   } else {
-    estadoSeleccionado = parkingsProvider.estados.isNotEmpty ? parkingsProvider.estados[0] : null;
+    estadoSeleccionado = null;
   }
 
   if (estadoSeleccionado != null) {

@@ -20,18 +20,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBarWidget(
-            title: 'Configuración',
-            withBackButton: true,
-            function: () {
-              Navigator.of(context).pop();
-            }),
-        body: SingleChildScrollView(
-            child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: Column(
-                  children: [
-                    ButtonOutlineProfile(
+      appBar: AppBarWidget(
+        title: 'Configuración',
+        withBackButton: true,
+        function: () {
+          Navigator.of(context).pop();
+        },
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Column(
+            children: [
+              /*ButtonOutlineProfile(
                         title: 'Notificaciones',
                         subtitle: 'Alertas de tus movimientos',
                         function: () {
@@ -42,15 +43,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         subtitle: 'Revisa las sesiones activas de tu cuenta',
                         function: () {
                           _goPage('sessions');
-                        }),
-                    ButtonOutlineProfile(
-                        title: 'Eliminar cuenta',
-                        subtitle: 'Borra todo lo relacionado a tu cuenta',
-                        function: () {
-                          _goPage('delete_acount');
-                        })
-                  ],
-                ))));
+                        }),*/
+              ButtonOutlineProfile(
+                title: 'Eliminar cuenta',
+                subtitle: 'Borra todo lo relacionado a tu cuenta',
+                function: () {
+                  _goPage('delete_acount');
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _goPage(String page) {

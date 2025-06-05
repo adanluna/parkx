@@ -6,43 +6,26 @@ class UserRepository {
   final ApiBaseHelper _helper = ApiBaseHelper();
 
   Future<bool> register({required String nombre, required String email, required String apellidos, required String password}) async {
-    await _helper.post(path: '/register', body: {
-      'name': nombre,
-      'apellidos': apellidos,
-      'email': email,
-      'password': password,
-      'password_confirmation': password,
-    });
+    await _helper.post(
+      path: '/register',
+      body: {'name': nombre, 'apellidos': apellidos, 'email': email, 'password': password, 'password_confirmation': password},
+    );
     return true;
   }
 
   Future<bool> sendVerificationCode({required String email}) async {
-    await _helper.post(path: '/send-code', body: {
-      'email': email,
-    });
+    await _helper.post(path: '/send-code', body: {'email': email});
     return true;
   }
 
-  Future<bool> confirmCode({
-    required String email,
-    required String code,
-  }) async {
-    await _helper.post(path: '/verify', body: {
-      'email': email,
-      'code': code,
-    });
+  Future<bool> confirmCode({required String email, required String code}) async {
+    await _helper.post(path: '/verify', body: {'email': email, 'code': code});
     return true;
   }
 
-  Future<bool> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> login({required String email, required String password}) async {
     AccountManager.instance.clearAuth();
-    final response = await _helper.post(path: '/login', body: {
-      'email': email,
-      'password': password,
-    });
+    final response = await _helper.post(path: '/login', body: {'email': email, 'password': password});
     String token = response['data']['token'];
     var user = User.fromJSON(response['data']['user']);
     await AccountManager.instance.setAuth(user: user, token: token);
@@ -79,14 +62,17 @@ class UserRepository {
     int? cityId,
     int? genderId,
   }) async {
-    await _helper.put(path: '/me', body: {
-      'name': name,
-      'apellidos': apellidos,
-      if (birthDate != null) 'birth_date': birthDate,
-      if (stateId != null) 'state_id': stateId,
-      if (cityId != null) 'city_id': cityId,
-      if (genderId != null) 'gender_id': genderId,
-    });
+    await _helper.put(
+      path: '/me',
+      body: {
+        'name': name,
+        'apellidos': apellidos,
+        if (birthDate != null) 'birth_date': birthDate,
+        if (stateId != null) 'state_id': stateId,
+        if (cityId != null) 'city_id': cityId,
+        if (genderId != null) 'gender_id': genderId,
+      },
+    );
     return true;
   }
 
@@ -102,37 +88,22 @@ class UserRepository {
   }
 
   Future<bool> savePushToken({required String fcmToken}) async {
-    await _helper.post(path: '/user/fcm', body: {
-      'token': fcmToken,
-    });
+    await _helper.post(path: '/user/fcm', body: {'token': fcmToken});
     return true;
   }
 
   Future<bool> recoveryPasswordStep1({required String email}) async {
-    await _helper.post(path: '/forgot-password', body: {
-      'email': email,
-    });
+    await _helper.post(path: '/password/send-code', body: {'email': email});
     return true;
   }
 
-  Future<bool> recoveryPasswordStep2({
-    required String token,
-    required String email,
-    required String password,
-  }) async {
-    await _helper.post(path: '/reset-password', body: {
-      'token': token,
-      'email': email,
-      'password': password,
-      'password_confirmation': password,
-    });
+  Future<bool> recoveryPasswordStep2({required String email, required String code, required String password}) async {
+    await _helper.post(path: '/password/reset', body: {'code': code, 'email': email, 'password': password});
     return true;
   }
 
   Future<bool> resendVerificationCode({required String email}) async {
-    await _helper.post(path: '/resend-code', body: {
-      'email': email,
-    });
+    await _helper.post(path: '/resend-code', body: {'email': email});
     return true;
   }
 }

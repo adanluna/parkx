@@ -10,7 +10,9 @@ import 'package:parkx/widgets/button_parking.dart';
 import 'package:provider/provider.dart';
 
 class ParkingSearchScreen extends StatefulWidget {
-  const ParkingSearchScreen({super.key});
+  final bool manual;
+  final String code;
+  const ParkingSearchScreen({super.key, required this.manual, required this.code});
 
   static const routeName = '/parking_search';
 
@@ -95,6 +97,14 @@ class _ParkingSearchScreenState extends State<ParkingSearchScreen> {
                 ),
               ),
             ),
+            Padding(
+              padding: EdgeInsets.only(top: 20, bottom: 10, left: 20, right: 20),
+              child: Text(
+                'Selecciona el estacionamiento',
+                style: AppTheme.theme.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+            ),
             ValueListenableBuilder<bool>(
               valueListenable: showDropdown,
               builder: (context, visible, child) {
@@ -137,7 +147,7 @@ class _ParkingSearchScreenState extends State<ParkingSearchScreen> {
               padding: const EdgeInsets.only(bottom: 10, top: 10),
               child: Text(
                 (estadoSelected != null && showDropdown.value) ? estadoSelected!.nombre : '',
-                style: AppTheme.theme.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
+                style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
             (estacionamientos.isNotEmpty)
@@ -182,6 +192,10 @@ class _ParkingSearchScreenState extends State<ParkingSearchScreen> {
     AccountManager.instance.setEstado(estadoSelected!);
     parkingProvider.parking = estacionamiento;
     parkingProvider.selected = true;
-    Navigator.of(context).pop(estacionamiento.nombre);
+    if (!widget.manual) {
+      Navigator.of(context).pushNamed('/payment', arguments: {'code': widget.code});
+    } else {
+      Navigator.of(context).pushNamed('/manual_scanner');
+    }
   }
 }

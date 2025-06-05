@@ -1,8 +1,8 @@
 {
-  "flutter": "3.29.3",
+  "flutter": "3.32.0",
   "flavors": {
-    "development": "3.29.3",
-    "production": "3.29.3"
+    "development": "3.32.0",
+    "production": "3.32.0"
   },
   "updateVscodeSettings": true,
   "updateGitIgnore": true,

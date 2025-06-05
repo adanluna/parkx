@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
+import 'package:parkx/api/wallet_repository.dart';
 import 'package:parkx/models/credit_card.dart';
 import 'package:parkx/providers/wallet_provider.dart';
 import 'package:parkx/utils/app_theme.dart';
+import 'package:parkx/utils/dialogs.dart';
+import 'package:parkx/utils/wallet_functions.dart';
 import 'package:parkx/widgets/appbar.dart';
 import 'package:parkx/widgets/button_secondary.dart';
 import 'package:provider/provider.dart';
@@ -25,8 +29,18 @@ class _WalletScreenState extends State<WalletScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _initAsync();
+  }
+
+  Future<void> _initAsync() async {
+    await getWallet(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+    final walletProvider = Provider.of<WalletProvider>(context, listen: true);
 
     showCupon(BuildContext context) async {
       await showGeneralDialog(
@@ -39,89 +53,84 @@ class _WalletScreenState extends State<WalletScreen> {
           return Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(25)),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(25))),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                child: Card(
+                  elevation: 0,
+                  color: Colors.transparent,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsetsGeometry.only(bottom: 10),
+                        child: Center(
+                          child: Text(
+                            'Elige el método de pago',
+                            style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      ButtonSecondary(title: 'Efectivo en OXXO', function: _goOxxoAdd),
+                      ButtonSecondary(title: 'Transferencia vía SPEI', function: _goSpeiAdd),
+                      ButtonSecondary(title: 'Tarjeta de Crédito o Débito', function: _goPrepaidAdd),
+                    ],
+                  ),
                 ),
-                child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                    child: Card(
-                        elevation: 0,
-                        color: Colors.transparent,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Center(child: Text('Abona saldo', style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold))),
-                            ButtonSecondary(title: 'Efectivo en OXXO', function: _goOxxoAdd),
-                            ButtonSecondary(title: 'Transferencia vía SPEI', function: _goSpeiAdd),
-                            ButtonSecondary(title: 'Tarjeta de Crédito o Débito', function: _goPrepaidAdd)
-                          ],
-                        )))),
+              ),
+            ),
           );
         },
         transitionBuilder: (context, anim1, anim2, child) {
-          return SlideTransition(
-            position: Tween(begin: const Offset(0, 1), end: const Offset(0, 0)).animate(anim1),
-            child: child,
-          );
+          return SlideTransition(position: Tween(begin: const Offset(0, 1), end: const Offset(0, 0)).animate(anim1), child: child);
         },
       );
     }
 
     return Scaffold(
-        appBar: const AppBarWidget(title: 'Billetera', withBackButton: false, function: null),
-        body: SingleChildScrollView(
-            child: Padding(
+      appBar: const AppBarWidget(title: 'Billetera', withBackButton: false, function: null),
+      body: SingleChildScrollView(
+        child: Padding(
           padding: const EdgeInsets.only(left: 20, right: 20),
           child: Column(
             children: [
               Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  decoration: const BoxDecoration(
-                    color: AppTheme.primaryColor,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Saldo en Prepago',
-                        style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                decoration: const BoxDecoration(color: AppTheme.primaryColor, borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Column(
+                  children: [
+                    Text(
+                      'Saldo en Prepago',
+                      style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white),
+                    ),
+                    Text(
+                      (walletProvider.wallet != null) ? "\$${walletProvider.wallet?.formattedBalance}" : '\$0.0',
+                      style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+                    ),
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 5), child: Divider(height: 1, thickness: 1, color: Colors.white24)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: ButtonSecondary(
+                        title: 'Recargar Saldo',
+                        function: () async {
+                          await showCupon(context);
+                        },
                       ),
-                      Text(
-                        (walletProvider.wallet != null) ? "\$${walletProvider.wallet?.balance}" : '\$0.0',
-                        style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5),
-                        child: Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Colors.white24,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: ButtonSecondary(
-                            title: 'Recargar Saldo',
-                            function: () async {
-                              await showCupon(context);
-                            }),
-                      ),
-                      Text(
-                        '¿Cómo recargar prepago?',
-                        textAlign: TextAlign.center,
-                        style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, fontSize: 17, color: Colors.white),
-                      ),
-                      Text(
-                        'Abona con métodos diferentes en OXXO (Efectivo), SPEI (Transferencia) y Tarjetas (Débito y Crédito)',
-                        textAlign: TextAlign.center,
-                        style: AppTheme.theme.textTheme.bodySmall!.copyWith(fontSize: 11, color: Colors.white),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                    ],
-                  )),
+                    ),
+                    Text(
+                      '¿Cómo recargar prepago?',
+                      textAlign: TextAlign.center,
+                      style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, fontSize: 17, color: Colors.white),
+                    ),
+                    Text(
+                      'Abona con métodos diferentes en OXXO (Efectivo), SPEI (Transferencia) y Tarjetas (Débito y Crédito)',
+                      textAlign: TextAlign.center,
+                      style: AppTheme.theme.textTheme.bodySmall!.copyWith(fontSize: 11, color: Colors.white),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ),
               /*Padding(
                 padding: const EdgeInsets.only(top: 30),
                 child: Text(
@@ -159,18 +168,19 @@ class _WalletScreenState extends State<WalletScreen> {
                   style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
-              /*Column(
-                children: walletProvider.wallet!.cards!.map((CreditCard card) {
-                  return SizedBox(
-                    width: double.infinity,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5.0),
-                      child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(Radius.circular(10)),
-                            border: Border.all(color: AppTheme.primaryColor),
-                          ),
-                          child: Padding(
+              Column(
+                children:
+                    walletProvider.wallet!.cards!.map((CreditCard card) {
+                      return SizedBox(
+                        width: double.infinity,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(Radius.circular(10)),
+                              border: Border.all(color: AppTheme.primaryColor),
+                            ),
+                            child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -179,9 +189,13 @@ class _WalletScreenState extends State<WalletScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '${card.brand.toUpperCase()}/----${card.last4}',
+                                        '${card.brand.toUpperCase()} / *****${card.last4}',
                                         style: const TextStyle(
-                                            color: AppTheme.primaryColor, fontFamily: 'Roboto', fontSize: 13, fontWeight: FontWeight.bold),
+                                          color: AppTheme.primaryColor,
+                                          fontFamily: 'Roboto',
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       Text(
                                         'Vencimiento: ${(card.expMonth < 10) ? '0' : ''}${card.expMonth}/${card.expYear}',
@@ -189,21 +203,31 @@ class _WalletScreenState extends State<WalletScreen> {
                                       ),
                                     ],
                                   ),
-                                  const Icon(
-                                    Icons.arrow_forward_outlined,
-                                    size: 25,
-                                    color: AppTheme.primaryColor,
+                                  SizedBox(
+                                    width: 28,
+                                    child: RawMaterialButton(
+                                      onPressed: () => deleteCardModal(context, card),
+                                      elevation: 0.0,
+                                      fillColor: AppTheme.secondaryColor,
+                                      padding: const EdgeInsets.all(5.0),
+                                      shape: const CircleBorder(),
+                                      child: const Icon(Icons.delete, size: 18.0),
+                                    ),
                                   ),
                                 ],
-                              ))),
-                    ),
-                  );
-                }).toList(),
-              ),*/
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+              ),
               ButtonSecondary(title: 'Añadir tarjeta', function: _goCreditCardAdd),
             ],
           ),
-        )));
+        ),
+      ),
+    );
   }
 
   void _goOxxoAdd() {
@@ -221,6 +245,50 @@ class _WalletScreenState extends State<WalletScreen> {
   }
 
   void _goPrepaidAdd() {
+    Navigator.of(context).pop();
     Navigator.of(context).pushNamed('/prepaid_add');
+  }
+
+  void deleteCardModal(BuildContext context, CreditCard card) async {
+    showConfirmDialog(
+      context,
+      message: '¿Estás seguro de eliminar la tarjeta ${card.brand.toUpperCase()} ****${card.last4}?',
+      onConfirm: () {
+        Navigator.of(context).pop();
+        _deleteCard(context, card);
+      },
+      onCancel: () => Navigator.of(context).pop(),
+    );
+  }
+
+  void _deleteCard(BuildContext context, CreditCard card) {
+    context.loaderOverlay.show();
+
+    WalletRepository()
+        .deleteCard(card.id)
+        .then(
+          (value) async {
+            // Update Wallet
+            await getWallet(context);
+            if (!context.mounted) return;
+            context.loaderOverlay.hide();
+            if (value) {
+              showAceptDialog(
+                context,
+                message: "Tarjeta borrada",
+                onConfirm: () {
+                  Navigator.of(context).pop();
+                },
+              );
+            } else {
+              showErrorDialog(context, message: "No se pudo borrar tarjeta");
+            }
+          },
+          onError: (error) {
+            context.loaderOverlay.hide();
+            print(error);
+            showErrorDialog(context, message: error.message);
+          },
+        );
   }
 }

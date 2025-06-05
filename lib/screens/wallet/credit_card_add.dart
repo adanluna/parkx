@@ -42,56 +42,79 @@ class _CreditCardAddScreenState extends State<CreditCardAddScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBarWidget(
-            title: 'Agregar tarjeta',
-            withBackButton: true,
-            function: () {
-              Navigator.of(context).pop('');
-            }),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 30),
-                color: AppTheme.accentColor,
-                child: Container(
-                  height: 150,
-                  width: 100,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/credit_card.png'),
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
+      appBar: AppBarWidget(
+        title: 'Agregar tarjeta',
+        withBackButton: true,
+        function: () {
+          Navigator.of(context).pop('');
+        },
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 30),
+              color: AppTheme.accentColor,
+              child: Container(
+                height: 150,
+                width: 100,
+                decoration: const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/credit_card.png'), fit: BoxFit.contain)),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 30, bottom: 10, left: 20, right: 20),
-                child: CardFormField(
-                  autofocus: true,
-                  controller: controller,
-                ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 30, bottom: 10, left: 20, right: 20),
+              child: CardFormField(autofocus: true, controller: controller),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(left: 20, right: 20),
+              child: AlertBox(
+                text:
+                    'Por tu seguridad realizaremos un cargo de centavos (menos de \$1 peso) a tu tarjeta. Este monto se reembolsará de automáticamente entre 1 y 1o días hábiles dependiendo de tu banco.',
               ),
-              const Padding(
-                padding: EdgeInsets.only(left: 20, right: 20),
-                child: AlertBox(
-                    text:
-                        'Por tu seguridad realizaremos un cargo de centavos (menos de \$1 peso) a tu tarjeta. Este monto se reembolsará de automáticamente entre 1 y 1o días hábiles dependiendo de tu banco.'),
-              ),
-              Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 40),
-                  child: ButtonSecondary(
-                    title: 'Guardar tarjeta',
-                    function: () => _saveCard(),
-                    active: controller.details.complete,
-                  )),
-            ],
-          ),
-        ));
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 40),
+              child: ButtonSecondary(title: 'Guardar tarjeta', function: () => _saveCard(), active: controller.details.complete),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _saveCard() async {
+    context.loaderOverlay.show();
+    WalletRepository().saveCreditCard().then(
+      (response) async {
+        // Update Wallet
+        await getWallet(context);
+
+        if (!mounted) return;
+        context.loaderOverlay.hide();
+        if (response == '') {
+          showAceptDialog(
+            context,
+            message: "Tarjeta guardada",
+            onConfirm: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            },
+          );
+        } else {
+          showErrorDialog(context, message: response);
+        }
+      },
+      onError: (error) {
+        if (!mounted) return;
+        context.loaderOverlay.hide();
+        print(error);
+        showErrorDialog(context, message: error.message);
+      },
+    );
+  }
+
+  /*void _saveCard() async {
     context.loaderOverlay.show();
 
     WalletRepository().saveCreditCard().then((value) async {
@@ -102,7 +125,7 @@ class _CreditCardAddScreenState extends State<CreditCardAddScreen> {
 
       if (!mounted) return;
 
-      if (value) {
+      if (value == true) {
         showAceptDialog(context, message: "Tarjeta guardada", onConfirm: () {
           Navigator.of(context).pop();
           Navigator.of(context).pop();
@@ -115,5 +138,5 @@ class _CreditCardAddScreenState extends State<CreditCardAddScreen> {
       print(error);
       showErrorDialog(context, message: error.error.message);
     });
-  }
+  }*/
 }

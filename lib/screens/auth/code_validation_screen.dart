@@ -24,119 +24,129 @@ class _CodeValidationScreenState extends State<CodeValidationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Builder(builder: (context) {
-      return Column(
-        children: <Widget>[
-          const Expanded(
-            flex: 1,
-            child: LogoBackground(),
-          ),
-          Expanded(
-              flex: 2,
-              child: Container(
-                color: AppTheme.primaryColor,
-                child: Stack(
-                  children: [
-                    Positioned.fill(
+    return Scaffold(
+      body: Builder(
+        builder: (context) {
+          return Column(
+            children: <Widget>[
+              const Expanded(flex: 1, child: LogoBackground()),
+              Expanded(
+                flex: 2,
+                child: Container(
+                  color: AppTheme.primaryColor,
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
                         child: Container(
-                      decoration: const BoxDecoration(
-                          color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-                    )),
-                    Positioned.fill(
-                        child: Column(children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        width: 40,
-                        height: 5,
-                        decoration: const BoxDecoration(color: AppTheme.accentColor, borderRadius: BorderRadius.all(Radius.circular(50))),
-                      ),
-                      Expanded(
-                          child: Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: Container(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: SingleChildScrollView(
-                              child: Column(
-                            children: [
-                              Text(
-                                "Código de validación",
-                                style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                                  child: Text(
-                                      'Por tu seguridad te enviamos un código de 5 dígitos a tu correo electrónico, este puede tardar hasta 1 minuto en llegar.',
-                                      textAlign: TextAlign.center,
-                                      style: AppTheme.theme.textTheme.bodyMedium)),
-                              Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 15),
-                                  child: PinCodeTextField(
-                                    appContext: context,
-                                    length: 5,
-                                    controller: otpController,
-                                    animationType: AnimationType.fade,
-                                    pinTheme: PinTheme(
-                                      shape: PinCodeFieldShape.box,
-                                      borderRadius: BorderRadius.circular(10),
-                                      fieldHeight: 50,
-                                      fieldWidth: 50,
-                                      activeFillColor: Colors.white,
-                                    ),
-                                    textStyle: const TextStyle(fontSize: 40),
-                                    onCompleted: (verificationCode) {
-                                      _validate(context, verificationCode);
-                                    },
-                                    onChanged: (value) {},
-                                  )),
-                              Column(
-                                children: [
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16.0),
-                                      child: OtpTimerButton(
-                                        controller: controller,
-                                        backgroundColor: AppTheme.accentColor,
-                                        textColor: Colors.black,
-                                        onPressed: () {},
-                                        text: const Text('Reenviar código'),
-                                        duration: 15,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                                      child: ElevatedButton(
-                                        onPressed: _goLogin,
-                                        child: const Text('Regresar'),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                      padding: const EdgeInsets.only(top: 30, left: 20, right: 20),
-                                      child: Center(
-                                          child: Text(
-                                        'Al ingresar aceptas nuestros Términos y condiciones, así como nuestro Aviso de Privacidad',
-                                        textAlign: TextAlign.center,
-                                        style: AppTheme.theme.textTheme.bodySmall!.copyWith(fontSize: 12),
-                                      )))
-                                ],
-                              ),
-                            ],
-                          )),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                          ),
                         ),
-                      ))
-                    ]))
-                  ],
+                      ),
+                      Positioned.fill(
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 10),
+                            Container(
+                              width: 40,
+                              height: 5,
+                              decoration: const BoxDecoration(color: AppTheme.accentColor, borderRadius: BorderRadius.all(Radius.circular(50))),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Container(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          "Código de validación",
+                                          style: AppTheme.theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                                          child: Text(
+                                            'Por tu seguridad te enviamos un código de 5 dígitos a tu correo electrónico, este puede tardar hasta 1 minuto en llegar.',
+                                            textAlign: TextAlign.center,
+                                            style: AppTheme.theme.textTheme.bodyMedium,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                                          child: PinCodeTextField(
+                                            appContext: context,
+                                            length: 5,
+                                            controller: otpController,
+                                            animationType: AnimationType.fade,
+                                            pinTheme: PinTheme(
+                                              shape: PinCodeFieldShape.box,
+                                              borderRadius: BorderRadius.circular(10),
+                                              fieldHeight: 70,
+                                              fieldWidth: 50,
+                                              activeFillColor: Colors.white,
+                                            ),
+                                            textStyle: const TextStyle(fontSize: 20),
+                                            onCompleted: (verificationCode) {
+                                              _validate(context, verificationCode);
+                                            },
+                                            onChanged: (value) {},
+                                          ),
+                                        ),
+                                        Column(
+                                          children: [
+                                            SizedBox(
+                                              width: double.infinity,
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16.0),
+                                                child: OtpTimerButton(
+                                                  controller: controller,
+                                                  backgroundColor: AppTheme.accentColor,
+                                                  textColor: Colors.black,
+                                                  onPressed: () {},
+                                                  text: const Text('Reenviar código'),
+                                                  duration: 15,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: double.infinity,
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                                child: ElevatedButton(onPressed: _goLogin, child: const Text('Regresar')),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 30, left: 20, right: 20),
+                                              child: Center(
+                                                child: Text(
+                                                  'Al ingresar aceptas nuestros Términos y condiciones, así como nuestro Aviso de Privacidad',
+                                                  textAlign: TextAlign.center,
+                                                  style: AppTheme.theme.textTheme.bodySmall!.copyWith(fontSize: 12),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              )),
-        ],
-      );
-    }));
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   void _validate(BuildContext context, verificationCode) async {

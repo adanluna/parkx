@@ -18,10 +18,11 @@ import 'package:parkx/screens/auth/register_screen.dart';
 import 'package:parkx/screens/parking/parking_search_screen.dart';
 import 'package:parkx/screens/parking/payment_screen.dart';
 import 'package:parkx/screens/parking/payment_success_screen.dart';
+import 'package:parkx/screens/profile/abonos.dart';
+import 'package:parkx/screens/profile/pagos.dart';
 import 'package:parkx/screens/profile/billing.dart';
 import 'package:parkx/screens/profile/billing_update.dart';
 import 'package:parkx/screens/profile/delete_account.dart';
-import 'package:parkx/screens/profile/historical.dart';
 import 'package:parkx/screens/profile/notifications.dart';
 import 'package:parkx/screens/profile/personal_data.dart';
 import 'package:parkx/screens/profile/personal_data_update.dart';
@@ -59,9 +60,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    EasyLoading.instance
-      ..displayDuration = const Duration(milliseconds: 50)
-      ..maskColor = Colors.blue.withOpacity(1);
     super.initState();
     WidgetsFlutterBinding.ensureInitialized();
   }
@@ -70,6 +68,9 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return GlobalLoaderOverlay(
       overlayColor: Colors.black.withOpacity(0.5),
+      overlayWidgetBuilder: (_) {
+        return const Center(child: CircularProgressIndicator(color: AppTheme.secondaryColor, strokeWidth: 4));
+      },
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<ParkingProvider>(create: (_) => ParkingProvider()),
@@ -110,7 +111,7 @@ class _MyAppState extends State<MyApp> {
                     case PasswordRecoveryScreen.routeName:
                       return const PasswordRecoveryScreen();
                     case PasswordValidationScreen.routeName:
-                      return const PasswordValidationScreen();
+                      return PasswordValidationScreen(email: arguments?['email'] as String);
                     case PasswordSuccessScreen.routeName:
                       return const PasswordSuccessScreen();
                     /***** Scanner Ticket  ****/
@@ -121,9 +122,15 @@ class _MyAppState extends State<MyApp> {
                     case PaymentScreen.routeName:
                       return PaymentScreen(code: arguments?['code'] as String);
                     case PaymentSuccessScreen.routeName:
-                      return const PaymentSuccessScreen();
+                      return PaymentSuccessScreen(
+                        total: arguments?['total'] as int,
+                        comision: arguments?['comision'] as int,
+                        subtotal: arguments?['subtotal'] as int,
+                        descuento: arguments?['descuento'] as int,
+                        cupon: arguments?['cupon'] as String,
+                      );
                     case ParkingSearchScreen.routeName:
-                      return const ParkingSearchScreen();
+                      return ParkingSearchScreen(manual: arguments?['manual'] as bool, code: arguments?['code'] as String);
                     case NotFoundParkingScreen.routeName:
                       return const NotFoundParkingScreen();
                     case ErrorParkingScreen.routeName:
@@ -136,17 +143,21 @@ class _MyAppState extends State<MyApp> {
                     case OxxoAddScreen.routeName:
                       return const OxxoAddScreen();
                     case OxxoFinishScreen.routeName:
-                      return OxxoFinishScreen(amount: arguments?['amount'] as num);
+                      return OxxoFinishScreen(
+                        amount: arguments?['amount'] as String,
+                        voucherUrl: arguments?['voucherUrl'] as String,
+                        expiresAt: arguments?['expiresAt'] as String,
+                      );
                     case SpeiAddScreen.routeName:
                       return const SpeiAddScreen();
                     case SpeiFinishScreen.routeName:
-                      return const SpeiFinishScreen();
+                      return SpeiFinishScreen(amount: arguments?['amount'] as String, urlPayment: arguments?['urlPayment'] as String);
                     case CreditCardAddScreen.routeName:
                       return const CreditCardAddScreen();
                     case PrepaidAddScreen.routeName:
                       return const PrepaidAddScreen();
                     case PrepaidFinishScreen.routeName:
-                      return const PrepaidFinishScreen();
+                      return PrepaidFinishScreen(amount: arguments?['amount'] as String);
                     /***** Profile  ****/
                     case ProfileScreen.routeName:
                       return const ProfileScreen();
@@ -154,8 +165,10 @@ class _MyAppState extends State<MyApp> {
                       return const PersonalDataScreen();
                     case PersonalDataUpdateScreen.routeName:
                       return const PersonalDataUpdateScreen();
-                    case HistoricalScreen.routeName:
-                      return const HistoricalScreen();
+                    case AbonosScreen.routeName:
+                      return const AbonosScreen();
+                    case PagosScreen.routeName:
+                      return const PagosScreen();
                     case BillingScreen.routeName:
                       return const BillingScreen();
                     case BillingUpdateScreen.routeName:

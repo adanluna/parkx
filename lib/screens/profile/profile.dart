@@ -39,19 +39,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               ),
               ButtonOutlineProfile(
-                title: 'Historial',
-                subtitle: 'Todos tus abonos y pagos',
+                title: 'Abonos',
+                subtitle: 'Todos tus abonos realizados',
                 function: () {
-                  _goPage('historical');
+                  _goPage('abonos');
                 },
               ),
               ButtonOutlineProfile(
+                title: 'Pagos',
+                subtitle: 'Todos pagos de boletos',
+                function: () {
+                  _goPage('pagos');
+                },
+              ),
+              /*ButtonOutlineProfile(
                 title: 'Facturación',
                 subtitle: 'Tus datos fiscales',
                 function: () {
                   _goPage('billing');
                 },
-              ),
+              ),*/
               ButtonOutlineProfile(
                 title: 'Configuración',
                 subtitle: 'Todo lo relacionado con esta app',

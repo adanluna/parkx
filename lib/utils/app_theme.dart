@@ -19,11 +19,13 @@ class AppTheme {
 
   static ThemeData get theme {
     return ThemeData(
-      pageTransitionsTheme: PageTransitionsTheme(builders: {
-        TargetPlatform.android: _NoAnimationTransition(),
-        TargetPlatform.iOS: _NoAnimationTransition(),
-        // if you have more you can add them here
-      }),
+      pageTransitionsTheme: PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: _NoAnimationTransition(),
+          TargetPlatform.iOS: _NoAnimationTransition(),
+          // if you have more you can add them here
+        },
+      ),
       colorScheme: const ColorScheme(
         brightness: Brightness.light,
         primary: Color(0xff000000),
@@ -62,52 +64,32 @@ class AppTheme {
       scaffoldBackgroundColor: Colors.white,
       primaryColor: primaryColor,
       fontFamily: 'Sansation',
-      tabBarTheme: const TabBarTheme(
-          labelColor: accentColor,
-          unselectedLabelColor: Color.fromARGB(255, 185, 181, 178),
-          indicator: BoxDecoration(),
-          labelStyle: TextStyle(fontSize: 9),
-          unselectedLabelStyle: TextStyle(fontSize: 9)),
+      tabBarTheme: const TabBarThemeData(
+        labelColor: accentColor,
+        unselectedLabelColor: Color.fromARGB(255, 185, 181, 178),
+        indicator: BoxDecoration(),
+        labelStyle: TextStyle(fontSize: 9),
+        unselectedLabelStyle: TextStyle(fontSize: 9),
+      ),
       textSelectionTheme: const TextSelectionThemeData(
         cursorColor: Colors.black,
         selectionHandleColor: Colors.grey,
         selectionColor: Color.fromARGB(255, 221, 221, 221),
       ),
       textTheme: const TextTheme(
-          displayLarge: TextStyle(
-            fontWeight: FontWeight.w400,
-            fontSize: 25,
-            color: primaryColor,
-          ),
-          bodyLarge: TextStyle(
-            fontSize: 21,
-            color: Colors.black,
-          ),
-          bodyMedium: TextStyle(
-            fontSize: 16,
-            color: Colors.black,
-          ),
-          bodySmall: TextStyle(
-            fontWeight: FontWeight.w400,
-            fontSize: 14,
-            color: textColor,
-          ),
-          titleMedium: TextStyle(
-            fontWeight: FontWeight.w400,
-            fontSize: 16,
-          ),
-          titleSmall: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          )),
+        displayLarge: TextStyle(fontWeight: FontWeight.w400, fontSize: 25, color: primaryColor),
+        bodyLarge: TextStyle(fontSize: 21, color: Colors.black),
+        bodyMedium: TextStyle(fontSize: 16, color: Colors.black),
+        bodySmall: TextStyle(fontWeight: FontWeight.w400, fontSize: 14, color: textColor),
+        titleMedium: TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
+        titleSmall: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+      ),
       buttonTheme: ButtonThemeData(
         height: 50,
         buttonColor: accentColor,
         textTheme: ButtonTextTheme.normal,
         colorScheme: const ColorScheme.light(primary: Colors.black, secondary: Colors.black),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -139,20 +121,13 @@ class AppTheme {
         contentPadding: EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
-          borderSide: BorderSide(
-            color: primaryColor,
-            width: 0,
-            style: BorderStyle.none,
-          ),
+          borderSide: BorderSide(color: primaryColor, width: 0, style: BorderStyle.none),
         ),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: secondaryColor, width: 1),
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
-        errorBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: errorColor, width: 2),
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
+        errorBorder: OutlineInputBorder(borderSide: BorderSide(color: errorColor, width: 2), borderRadius: BorderRadius.all(Radius.circular(10))),
       ),
     );
   }

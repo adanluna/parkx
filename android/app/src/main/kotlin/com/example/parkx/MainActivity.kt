@@ -1,4 +1,4 @@
-package com.parkx.parkx
+package com.parkxmx.parkx
 
 import io.flutter.embedding.android.FlutterActivity
 
